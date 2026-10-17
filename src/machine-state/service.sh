@@ -93,7 +93,20 @@ ms_listening() {
 # closed, output appended to LOG) from CWD. Export any environment the
 # command needs BEFORE calling: the child inherits this shell's
 # exported variables.
+#
+# The launcher subshell's own stdout/stderr MUST be redirected away
+# (>/dev/null 2>&1 on the subshell): the subshell forks the daemon
+# and can linger as the daemon's parent, and while it lives it holds
+# an inherited copy of the CALLER's stdout. Under restart-run.sh the
+# caller's stdout is a command-substitution capture pipe, so a
+# lingering launcher held the pipe open forever — the runner hung
+# past every timeout, the sentinel's pass never completed, and no
+# result line was ever logged for the launching subscriber
+# (diagnosed live 2026-10-17: sentinel "failed" all day, transports
+# flapping). Redirecting the subshell's descriptors means the pipe
+# sees EOF when the subscriber's main shell exits, regardless of the
+# launcher's lifetime.
 ms_launch() {
   local log="$1" cwd="$2"; shift 2
-  ( cd "$cwd" && setsid nohup "$@" >> "$log" 2>&1 < /dev/null & )
+  ( cd "$cwd" && setsid nohup "$@" >> "$log" 2>&1 < /dev/null & ) >/dev/null 2>&1
 }
