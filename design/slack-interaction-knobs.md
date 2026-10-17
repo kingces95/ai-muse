@@ -59,16 +59,18 @@ human — moved to a medium where the round trip is seconds. The mapping:
 ### Recognizing a human (implementation note)
 
 "Respond to humans" is implemented mechanically, never by reading
-formatting. A message counts as a human speaking when its author ID
-is in scope **and** it does not bear the platform's agent stamp
-(the connector's "Sent using Muse"). A stamped message is agent
-output — the bot's own as-human replies carry it, which is what
-keeps the bot from answering itself — and is never answerable,
-whoever it is addressed to. Italics and other formatting mark
-voice; they authenticate nobody, and no rule may treat them as
-identity. The stamp does not disqualify a *knock*: the principal
-may knock through the connector (their agent posting at their
-word), and the wake test stays ID + mention.
+formatting — and the stamp test is scoped to speakers **other than
+the principal**. For another human, a message counts as the human
+speaking when its author ID is in scope **and** it does not bear
+the platform's agent stamp (the connector's "Sent using Muse");
+a stamped message under their ID is their agent's output —
+context, never answerable as the human. For the principal there
+is no stamp test at all: their messages are theirs whether typed
+or posted by their agent at their word, knocks included (the wake
+test stays ID + mention). The bot's own as-human replies are known
+to it by its epoch record, not by any stamp — they are replies,
+never fresh asks. Italics and other formatting mark voice; they
+authenticate nobody, and no rule may treat them as identity.
 
 ### `trusted_set` — who counts as trusted
 Named by platform user ID in the instance settings. Membership is the
