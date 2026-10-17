@@ -129,10 +129,21 @@ levels cost certainty.
   operator's word. *(Under test: the current state.)*
 - `cert` — a certmint identity cert binds the person to the platform
   ID (sign-in with the platform as the cert's provider; the workspace
-  is pinned, verification is fail-closed). The cert is kept on file;
-  expiry and revocation are checked when the binding is set up.
+  is pinned, verification is fail-closed). The cert is kept on file
+  and re-verified on a cadence (below). *(Under test, with the
+  cadences below.)*
 - `cert-fresh` — additionally, possession is re-proven per epoch, so
   a copied config alone cannot impersonate.
+
+Verification cadence (part of the `cert` level, set per instance):
+- `verify_per: epoch` — at every wake, the held cert is verified
+  locally: mint signature, expiry, identity match against the ID
+  being trusted. Local crypto, no network, effectively free.
+- `revocation_poll: daily` — the mint's revoked list is fetched
+  once a day by a silent job and cached; epochs consult the cache.
+  A cert found revoked or expired voids the binding: the epoch
+  surfaces it to the human and the level falls back to *nothing* —
+  never a silent downgrade to `asserted`.
 
 ## Escalation is not a knob
 
