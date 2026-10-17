@@ -56,6 +56,20 @@ human — moved to a medium where the round trip is seconds. The mapping:
   the other. Bots are context, never conversation partners, unless the
   human directs a specific exchange. *(Under test: `never`.)*
 
+### Recognizing a human (implementation note)
+
+"Respond to humans" is implemented mechanically, never by reading
+formatting. A message counts as a human speaking when its author ID
+is in scope **and** it does not bear the platform's agent stamp
+(the connector's "Sent using Muse"). A stamped message is agent
+output — the bot's own as-human replies carry it, which is what
+keeps the bot from answering itself — and is never answerable,
+whoever it is addressed to. Italics and other formatting mark
+voice; they authenticate nobody, and no rule may treat them as
+identity. The stamp does not disqualify a *knock*: the principal
+may knock through the connector (their agent posting at their
+word), and the wake test stays ID + mention.
+
 ### `trusted_set` — who counts as trusted
 Named by platform user ID in the instance settings. Membership is the
 human's act, like adding a sender to a mail-policy tier. Each member's
