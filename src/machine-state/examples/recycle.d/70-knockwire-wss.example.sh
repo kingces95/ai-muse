@@ -23,6 +23,17 @@
 # with StrictHostKeyChecking=accept-new) — kw-client.py connect does
 # not set StrictHostKeyChecking itself and will fail otherwise.
 #
+# Front-door moves: the pinned key is whatever the CURRENT front
+# door presents. Moving the door (a new hostname, a re-pointed
+# tunnel ingress) can present a different host key for the same
+# sshd, and the connect leg then fails host-key verification until
+# known_hosts is re-seeded for the new name. Re-seeding is a trust
+# decision — verify the new key over an independent path first;
+# the revive path must never do it silently. (Seen live 2026-10-18
+# on the knockwire .ai → .net flip: the .net door presented a
+# different key and the consumer's connect leg stayed down until
+# the operator re-seeded known_hosts by hand.)
+#
 # To use: copy into recycle.d/ in the deployment directory (beside
 # restart-run.sh and service.sh), drop the ".example" from the name,
 # make it executable, and set in machine.env:
